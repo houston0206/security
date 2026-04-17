@@ -1,6 +1,6 @@
-# (_TODO: fill in the title of this assignment here!_)
+Rainbow Table
 
-Authors: (_TODO: fill in your names here!_)
+Authors: El Houston, Emory Chien
 
 ## Build commands
 
@@ -10,6 +10,6 @@ Authors: (_TODO: fill in your names here!_)
 
 ## Resources
 
-*   (_TODO: fill in resources here!_)
+*   https://osera.cs.grinnell.edu/ttap/data-structures-labs/rainbow-tables.html 
 *   ...
 *   ...
