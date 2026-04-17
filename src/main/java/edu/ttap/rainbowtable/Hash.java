@@ -1,5 +1,6 @@
 package edu.ttap.rainbowtable;
 
-public class Hash {
-    
-}
+/**
+ * An immutable hash value, represented as a string.
+ */
+public record Hash(String value) { }

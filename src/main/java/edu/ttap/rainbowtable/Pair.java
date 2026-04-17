@@ -1,5 +1,6 @@
 package edu.ttap.rainbowtable;
 
-public class Pair {
-    
-}
+/**
+ * An immutable, generic pair of values.
+ */
+public record Pair<T, U>(T first, U second) { }

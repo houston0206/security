@@ -1,5 +1,6 @@
 package edu.ttap.rainbowtable;
 
-public class Password {
-    
-}
+/**
+ * An immutable password value, represented as a string.
+ */
+public record Password(String value) { }
