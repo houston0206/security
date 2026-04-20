@@ -11,5 +11,5 @@ Authors: El Houston, Emory Chien
 ## Resources
 
 *   https://osera.cs.grinnell.edu/ttap/data-structures-labs/rainbow-tables.html 
-*   ...
+*   https://osera.cs.grinnell.edu/ttap/data-structures-labs/exploring-graphs.html 
 *   ...

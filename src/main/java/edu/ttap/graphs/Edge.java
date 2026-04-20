@@ -1,5 +1,4 @@
 package edu.ttap.graphs;
 
-public class Edge {
-    
-}
+/** An edge of the graph, capturing the source and destination nodes. */
+public record Edge(String src, String dest) { }

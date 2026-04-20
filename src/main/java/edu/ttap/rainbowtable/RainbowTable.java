@@ -64,7 +64,7 @@ public class RainbowTable {
         for (int i = 0; i < maxSteps; i++) {
             p = reducer.apply(curHash);
             if(getStart(p) != null) {
-                p = getStart(p); // double usage of this function, combine later, p is also now equal to the start of the chain
+                p = getStart(p);
                 hasAnswer = true;
                 break;
             } 
