@@ -3,17 +3,19 @@ package edu.ttap.graphs;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
 import java.util.TreeSet;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.LinkedList;
 
 /**
  * A generic, weighted, undirected graph where nodes are represented by strings.
  */
 public class Graph {
-    Map<Edge, Integer> edges;
+    Map<Edge, Integer> weights;
     Map<String, ArrayList<String>> vertices;
 
     /**
@@ -21,18 +23,27 @@ public class Graph {
      * @param entries the entries of the graph; each entry is one edge
      */
     public Graph(List<GraphEntry> entries) {
-        edges = new HashMap<Edge, Integer>();
+        weights = new HashMap<Edge, Integer>();
         vertices = new HashMap<String, ArrayList<String>>();
         for(GraphEntry i : entries) {
             Edge e = new Edge(i.src(), i.dest());
-            edges.put(e, i.weight());
-            // arraylists need to be declared, but we also need to add existing values
-            ArrayList<String> destConnections = new ArrayList<>();
-            destConnections.add(i.src());
-            vertices.put(i.dest(), destConnections);
-            ArrayList<String> srcConnections = new ArrayList<>();
+            weights.put(e, i.weight());
+            Edge f = new Edge(i.dest(), i.src());
+            weights.put(f, i.weight()); //puts it in twice
+
+            if(!vertices.containsKey(i.src())) {
+                vertices.put(i.src(), new ArrayList<String>());
+            }
+            ArrayList<String> srcConnections = vertices.get(i.src());
             srcConnections.add(i.dest());
             vertices.put(i.src(), srcConnections);
+            
+            if(!vertices.containsKey(i.dest())) {
+                vertices.put(i.dest(), new ArrayList<String>());
+            }
+            ArrayList<String> destConnections = vertices.get(i.dest());
+            destConnections.add(i.src());
+            vertices.put(i.dest(), destConnections);
         }
     }
 
@@ -53,10 +64,9 @@ public class Graph {
      */
     public Optional<Integer> getWeight(String src, String dest) {
         Optional<Integer> obj = Optional.empty();
-        // Note: src and dest are reversible
         Edge e = new Edge(src, dest);
-        if (edges.containsKey(e)) {
-            obj = Optional.of(edges.get(e));
+        if (weights.containsKey(e)) {
+            obj = Optional.of(weights.get(e));
         }
         return obj;
     }
@@ -73,14 +83,14 @@ public class Graph {
         toVisit.add(start);
         while(!toVisit.isEmpty()) {
             String curNode = toVisit.pop();
-            visitedNodes.add(curNode);
-            ArrayList<String> neighbors = vertices.get(curNode);
-            for(String i : neighbors) {
-                if(!visitedNodes.contains(i)) {
-                    toVisit.push(i);
+            if(!visitedNodes.contains(curNode)) {
+                visitedNodes.add(curNode);
+                ArrayList<String> neighbors = vertices.get(curNode);
+                for(String i : neighbors) {
+                        toVisit.push(i);
                 }
+                traversal.add(curNode);
             }
-            traversal.add(curNode);
         }
         return traversal;
     }
@@ -91,8 +101,22 @@ public class Graph {
      * beginning at the starting node.
      */
     public List<String> collectBreadthFirst(String start) {
-        // TODO: implement me!
-        return null;
+        List<String> traversal = new ArrayList<>();
+        Queue<String> toVisit = new LinkedList<>();
+        Set<String> visitedNodes = new TreeSet<>();
+        toVisit.add(start);
+        while(!toVisit.isEmpty()) {
+            String curNode = toVisit.remove();
+            if(!visitedNodes.contains(curNode)) {
+                visitedNodes.add(curNode);
+                ArrayList<String> neighbors = vertices.get(curNode);
+                for(String i : neighbors) {
+                        toVisit.add(i);
+                }
+                traversal.add(curNode);
+            }
+        }
+        return traversal;
     }
 
     /**
@@ -101,7 +125,45 @@ public class Graph {
      * @return a list of edges that form a minimum spanning tree of the graph
      */
     public List<Edge> deriveMST(String start) {
-        // TODO: implement me!
-        return null;
-    }
+        Set<String> visitedNodes = new TreeSet<>();
+        Set<Edge> availableEdges = new TreeSet<>();
+        List<Edge> takenEdges = new ArrayList<>();
+
+        visitedNodes.add(start);
+        List<String> neighbors = vertices.get(start);
+        for (String i : neighbors) {
+            Edge e = new Edge(start, i);
+            availableEdges.add(e);
+        }
+        
+        while (vertices.size() > visitedNodes.size()) {
+            Edge smallest = null;
+            for (Edge e : availableEdges) {
+                if(smallest == null) {
+                    smallest = e;
+                } else if (weights.get(e) <= weights.get(smallest)) {
+                    smallest = e;
+                }
+            }
+
+            if (visitedNodes.contains(smallest.dest())) {
+                availableEdges.remove(smallest);
+                continue;
+            } else {
+                takenEdges.add(smallest);
+                String curNode = smallest.dest();
+                visitedNodes.add(curNode);
+                
+                List<String> adjacents = vertices.get(curNode);
+                for (String i : adjacents) {
+                    Edge f = new Edge(curNode, i);
+                    if (!takenEdges.contains(f)) {
+                        availableEdges.add(f);
+                    }
+                }
+            }
+        } //end while
+        
+        return takenEdges;
+    } // end MST
 }
