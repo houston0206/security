@@ -10,6 +10,9 @@ import java.util.TreeSet;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Scanner;
+import java.io.File;
+import java.io.FileNotFoundException;
 
 /**
  * A generic, weighted, undirected graph where nodes are represented by strings.
@@ -87,7 +90,7 @@ public class Graph {
                 visitedNodes.add(curNode);
                 ArrayList<String> neighbors = vertices.get(curNode);
                 for(String i : neighbors) {
-                        toVisit.push(i);
+                    toVisit.push(i);
                 }
                 traversal.add(curNode);
             }
@@ -111,7 +114,7 @@ public class Graph {
                 visitedNodes.add(curNode);
                 ArrayList<String> neighbors = vertices.get(curNode);
                 for(String i : neighbors) {
-                        toVisit.add(i);
+                    toVisit.add(i);
                 }
                 traversal.add(curNode);
             }
@@ -166,4 +169,68 @@ public class Graph {
         
         return takenEdges;
     } // end MST
+
+
+    /**
+     * 
+     * @param file
+     * @return a graph
+     */
+    private static Graph makeGraph(Scanner file) {
+        List<GraphEntry> edges = new ArrayList<>();
+        while (file.hasNextLine()) {
+            String line = file.nextLine();
+            String[] tokens = line.split(",");
+            edges.add(new GraphEntry(tokens[0], tokens[1], Integer.parseInt(tokens[2]))); 
+        }
+        file.close();
+        return new Graph(edges);
+    }
+
+    /**
+     * The main method.
+     */
+    public static void main(String[] args) throws FileNotFoundException {
+        // Create graphs
+        Scanner[] data = new Scanner[args.length];
+        Graph[] configurations = new Graph[args.length];
+        for(int i = 0; i < args.length; i++) {
+            try {
+                data[i] = new Scanner(new File(args[i]));
+            } catch (FileNotFoundException e) {
+                System.err.println("Could not find file: " + args[i]);
+                System.exit(1);
+            }
+            configurations[i] = makeGraph(data[i]);
+            data[i].close();
+        }
+
+        Set<String> machines = new TreeSet<>();
+        try {
+            Scanner mathlan = new Scanner(new File("data/mathlan-machines.txt"));
+            while (mathlan.hasNextLine()) {
+                String entry = mathlan.nextLine();
+                machines.add(entry);
+            }
+            mathlan.close();
+        } catch (FileNotFoundException e) {
+            System.err.println("mathlan-machines doesn't exist");
+            System.exit(1);
+        }
+        
+        Set<String>[] machinesSets = (Set<String>[])(new Set[args.length]);
+        for (int i = 0; i < args.length; i++) {
+            machinesSets[i] = new TreeSet(machines);
+            Set<String> keys = configurations[i].vertices.keySet();
+            String start = keys.iterator().next(); // Get a key from the set to start the traversal with
+            List<String> traversal = configurations[i].collectBreadthFirst(start);
+            for (String s : traversal) {
+                machinesSets[i].remove(s);
+            }
+            for (String m : machinesSets[i]) {
+                System.out.print(m + " ");
+            }
+            System.out.println("");
+        }
+    }
 }
